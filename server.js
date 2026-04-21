@@ -6,6 +6,7 @@ const http = require("http");
 const path = require("path");
 
 const PORT = Number(process.env.PORT || 3000);
+const HOST = process.env.HOST || "0.0.0.0";
 const ROOT = __dirname;
 const WS_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 
@@ -36,6 +37,15 @@ const rooms = new Map();
 const clients = new Map();
 
 const server = http.createServer((request, response) => {
+  if (request.url && new URL(request.url, "http://localhost").pathname === "/healthz") {
+    response.writeHead(200, {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+    });
+    response.end(JSON.stringify({ ok: true }));
+    return;
+  }
+
   const safePath = getSafeFilePath(request.url);
 
   if (!safePath) {
@@ -86,8 +96,8 @@ server.on("upgrade", (request, socket) => {
   attachClient(socket);
 });
 
-server.listen(PORT, () => {
-  console.log(`XOX Pulse multiplayer server running at http://localhost:${PORT}`);
+server.listen(PORT, HOST, () => {
+  console.log(`XOX Pulse multiplayer server running on ${HOST}:${PORT}`);
 });
 
 function getSafeFilePath(url) {
