@@ -672,17 +672,11 @@
   }
 
   function canUseOnline() {
-    return location.protocol !== "file:" && Boolean(resolveOnlineUrl()) && "WebSocket" in window;
+    return location.protocol !== "file:" && Boolean(onlineUrl()) && "WebSocket" in window;
   }
 
   function onlineUrl() {
-    const configuredUrl = resolveOnlineUrl();
-    if (configuredUrl) {
-      return configuredUrl;
-    }
-
-    const protocol = location.protocol === "https:" ? "wss:" : "ws:";
-    return `${protocol}//${location.host}/ws`;
+    return resolveOnlineUrl();
   }
 
   function resolveOnlineUrl() {
@@ -706,19 +700,25 @@
   }
 
   function normalizeWebSocketUrl(value) {
-    if (value.startsWith("wss://") || value.startsWith("ws://")) {
-      return value;
+    const trimmed = value.trim();
+
+    if (!trimmed || trimmed.startsWith("/") || trimmed.startsWith(".") || trimmed.includes("://") === false) {
+      return "";
     }
 
-    if (value.startsWith("https://")) {
-      return value.replace("https://", "wss://");
+    if (trimmed.startsWith("wss://") || trimmed.startsWith("ws://")) {
+      return trimmed;
     }
 
-    if (value.startsWith("http://")) {
-      return value.replace("http://", "ws://");
+    if (trimmed.startsWith("https://")) {
+      return trimmed.replace("https://", "wss://");
     }
 
-    return `wss://${value}`;
+    if (trimmed.startsWith("http://")) {
+      return trimmed.replace("http://", "ws://");
+    }
+
+    return "";
   }
 
   function isLocalHost() {
