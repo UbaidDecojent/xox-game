@@ -368,7 +368,7 @@
 
   function onlineDetailText() {
     if (!state.online.available) {
-      return "Run node server.js and open http://localhost:3000.";
+      return onlineUnavailableMessage();
     }
 
     if (state.online.connecting) {
@@ -672,19 +672,77 @@
   }
 
   function canUseOnline() {
-    return location.protocol !== "file:" && Boolean(location.host) && "WebSocket" in window;
+    return location.protocol !== "file:" && Boolean(resolveOnlineUrl()) && "WebSocket" in window;
   }
 
   function onlineUrl() {
+    const configuredUrl = resolveOnlineUrl();
+    if (configuredUrl) {
+      return configuredUrl;
+    }
+
     const protocol = location.protocol === "https:" ? "wss:" : "ws:";
     return `${protocol}//${location.host}/ws`;
+  }
+
+  function resolveOnlineUrl() {
+    const queryUrl = new URLSearchParams(location.search).get("ws");
+    const configUrl =
+      window.XOX_CONFIG && typeof window.XOX_CONFIG.websocketUrl === "string"
+        ? window.XOX_CONFIG.websocketUrl.trim()
+        : "";
+    const explicitUrl = (queryUrl || configUrl || "").trim();
+
+    if (explicitUrl) {
+      return normalizeWebSocketUrl(explicitUrl);
+    }
+
+    if (isLocalHost()) {
+      const protocol = location.protocol === "https:" ? "wss:" : "ws:";
+      return `${protocol}//${location.host}/ws`;
+    }
+
+    return "";
+  }
+
+  function normalizeWebSocketUrl(value) {
+    if (value.startsWith("wss://") || value.startsWith("ws://")) {
+      return value;
+    }
+
+    if (value.startsWith("https://")) {
+      return value.replace("https://", "wss://");
+    }
+
+    if (value.startsWith("http://")) {
+      return value.replace("http://", "ws://");
+    }
+
+    return `wss://${value}`;
+  }
+
+  function isLocalHost() {
+    return ["localhost", "127.0.0.1", "::1"].includes(location.hostname);
+  }
+
+  function onlineUnavailableMessage() {
+    if (location.protocol === "file:") {
+      return "Run node server.js and open http://localhost:3000.";
+    }
+
+    if (!("WebSocket" in window)) {
+      return "This browser does not support WebSockets.";
+    }
+
+    return "Online needs a WebSocket server URL in config.js.";
   }
 
   function ensureOnlineConnection(afterOpen) {
     state.online.available = canUseOnline();
 
     if (!state.online.available) {
-      state.online.notice = "Server unavailable from file mode.";
+      pendingOnlineAction = null;
+      state.online.notice = onlineUnavailableMessage();
       updateStatus();
       render();
       return;
@@ -736,6 +794,7 @@
     });
 
     onlineSocket.addEventListener("close", () => {
+      pendingOnlineAction = null;
       state.online.connected = false;
       state.online.connecting = false;
       state.online.notice = "Disconnected from server.";
@@ -746,6 +805,7 @@
     });
 
     onlineSocket.addEventListener("error", () => {
+      pendingOnlineAction = null;
       state.online.connected = false;
       state.online.connecting = false;
       state.online.notice = "Could not reach server.";
