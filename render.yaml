@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: xox-game-server
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
