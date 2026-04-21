@@ -706,19 +706,27 @@
       return "";
     }
 
+    let normalizedUrl = "";
+
     if (trimmed.startsWith("wss://") || trimmed.startsWith("ws://")) {
-      return trimmed;
+      normalizedUrl = trimmed;
+    } else if (trimmed.startsWith("https://")) {
+      normalizedUrl = trimmed.replace("https://", "wss://");
+    } else if (trimmed.startsWith("http://")) {
+      normalizedUrl = trimmed.replace("http://", "ws://");
+    } else {
+      return "";
     }
 
-    if (trimmed.startsWith("https://")) {
-      return trimmed.replace("https://", "wss://");
+    try {
+      const url = new URL(normalizedUrl);
+      if (!isLocalHost() && url.hostname === location.hostname) {
+        return "";
+      }
+      return url.href;
+    } catch {
+      return "";
     }
-
-    if (trimmed.startsWith("http://")) {
-      return trimmed.replace("http://", "ws://");
-    }
-
-    return "";
   }
 
   function isLocalHost() {
@@ -734,7 +742,7 @@
       return "This browser does not support WebSockets.";
     }
 
-    return "Online needs a WebSocket server URL in config.js.";
+    return "Online needs a separate WebSocket backend URL in config.js.";
   }
 
   function ensureOnlineConnection(afterOpen) {
