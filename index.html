@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>XOX Pulse</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <canvas id="fx-canvas" aria-hidden="true"></canvas>
+
+    <main class="game-shell" aria-labelledby="game-title">
+      <header class="topbar">
+        <div class="brand" id="game-title" aria-label="XOX Pulse">
+          <span>X</span><span>O</span><span>X</span>
+        </div>
+
+        <div class="score-strip" aria-label="Score">
+          <div class="score-item">
+            <span class="score-label">X</span>
+            <strong id="score-x">0</strong>
+          </div>
+          <div class="score-item">
+            <span class="score-label">Draw</span>
+            <strong id="score-draw">0</strong>
+          </div>
+          <div class="score-item">
+            <span class="score-label">O</span>
+            <strong id="score-o">0</strong>
+          </div>
+        </div>
+      </header>
+
+      <section class="arena" aria-label="XOX game">
+        <aside class="status-panel" aria-live="polite">
+          <span class="eyebrow" id="round-label">Round 1</span>
+          <p id="status-text">Your move. Claim a square.</p>
+          <div class="turn-meter" aria-hidden="true">
+            <span class="meter-x"></span>
+            <span class="meter-o"></span>
+          </div>
+        </aside>
+
+        <section class="board-stage">
+          <div class="board-wrap">
+            <div class="board" id="board" role="grid" aria-label="Tic tac toe board">
+              <button class="cell" data-cell="0" role="gridcell" aria-label="Top left"></button>
+              <button class="cell" data-cell="1" role="gridcell" aria-label="Top center"></button>
+              <button class="cell" data-cell="2" role="gridcell" aria-label="Top right"></button>
+              <button class="cell" data-cell="3" role="gridcell" aria-label="Middle left"></button>
+              <button class="cell" data-cell="4" role="gridcell" aria-label="Center"></button>
+              <button class="cell" data-cell="5" role="gridcell" aria-label="Middle right"></button>
+              <button class="cell" data-cell="6" role="gridcell" aria-label="Bottom left"></button>
+              <button class="cell" data-cell="7" role="gridcell" aria-label="Bottom center"></button>
+              <button class="cell" data-cell="8" role="gridcell" aria-label="Bottom right"></button>
+            </div>
+            <svg class="win-line" id="win-line" viewBox="0 0 100 100" aria-hidden="true">
+              <path id="win-path" pathLength="1" d="" />
+            </svg>
+          </div>
+        </section>
+
+        <aside class="move-panel">
+          <span class="eyebrow">Pulse rule</span>
+          <button class="toggle is-on" id="pulse-toggle" type="button" aria-pressed="true">
+            <span></span>
+            <strong>On</strong>
+          </button>
+          <p class="microcopy">A fourth mark removes your oldest one.</p>
+
+          <div class="online-panel" id="online-panel" hidden>
+            <span class="eyebrow">Room</span>
+            <strong class="room-code" id="room-code">No room</strong>
+            <div class="room-actions">
+              <button class="tool-btn" id="create-room-btn" type="button">Create</button>
+              <input
+                id="room-input"
+                class="room-input"
+                type="text"
+                inputmode="text"
+                maxlength="6"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="CODE"
+                aria-label="Room code"
+              />
+              <button class="tool-btn" id="join-room-btn" type="button">Join</button>
+              <button class="tool-btn" id="leave-room-btn" type="button">Leave</button>
+            </div>
+            <p class="microcopy online-copy" id="online-status">Create a room or join a code.</p>
+          </div>
+        </aside>
+      </section>
+
+      <footer class="controls" aria-label="Game controls">
+        <div class="segmented" role="group" aria-label="Opponent mode">
+          <button class="mode-btn is-active" type="button" data-mode="ai">AI</button>
+          <button class="mode-btn" type="button" data-mode="duel">Duel</button>
+          <button class="mode-btn" type="button" data-mode="online">Online</button>
+        </div>
+
+        <button class="tool-btn" id="difficulty-btn" type="button" title="Change AI difficulty" aria-label="Change AI difficulty">
+          <span class="tool-icon">AI</span>
+          <span id="difficulty-label">Sharp</span>
+        </button>
+
+        <button class="tool-btn icon-only" id="sound-btn" type="button" title="Toggle sound" aria-label="Toggle sound" aria-pressed="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 9h4l5-4v14l-5-4H4z" />
+            <path d="M16 8c1.4 1.1 2.2 2.5 2.2 4s-.8 2.9-2.2 4" />
+          </svg>
+        </button>
+
+        <button class="tool-btn icon-only" id="reset-btn" type="button" title="New round" aria-label="New round">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M19 8a7 7 0 1 0 1 6" />
+            <path d="M19 4v4h-4" />
+          </svg>
+        </button>
+      </footer>
+    </main>
+
+    <script src="main.js"></script>
+  </body>
+</html>

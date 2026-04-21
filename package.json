@@ -1,0 +1,12 @@
+{
+  "name": "xox-game",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Server-authoritative multiplayer XOX browser game.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
