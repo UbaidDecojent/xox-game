@@ -1,3 +1,3 @@
 window.XOX_CONFIG = {
-  websocketUrl: "wss://xox-game-decojent.netlify.app/ws",
+  websocketUrl: "https://xox-game-decojent.netlify.app/",
 };
